@@ -9,26 +9,13 @@ You may also assume that 2 ≤ n < 128.
  */
 @Immutable
 public class Board {
-    private final int[][] tiles;
-    private final int dimension;
+    private final SmallintMatrix matrix;
 
     // create a board from an n-by-n array of tiles,
     // where tiles[row][col] = tile at (row, col)
     public Board(int[][] inTiles) {
         validateN(inTiles.length);
-        dimension = inTiles.length;
-        tiles = deepCopy(inTiles);
-    }
-
-    private int[][] deepCopy(int[][] inTiles) {
-        int[][] ints = new int[dimension][dimension];
-        for (int i = 0; i < dimension; i++) {
-            if (inTiles[i].length != dimension) {
-                throw new IllegalArgumentException();
-            }
-            System.arraycopy(inTiles[i], 0, ints[i], 0, dimension);
-        }
-        return ints;
+        matrix = new SmallintMatrix(inTiles);
     }
 
     private void validateN(int n) {
@@ -40,11 +27,11 @@ public class Board {
     // string representation of this board
     public String toString() {
         StringBuilder s = new StringBuilder();
-        int n = dimension;
+        int n = dimension();
         s.append(n + "\n");
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                s.append(String.format("%2d ", tiles[i][j]));
+                s.append(String.format("%2d ", matrix.get(i,j)));
             }
             s.append("\n");
         }
@@ -53,7 +40,7 @@ public class Board {
 
     // board dimension n
     public int dimension() {
-        return dimension;
+        return matrix.getDimension();
     }
 
     //The Hamming distance between a board and the goal board is the number of tiles in the wrong position.
@@ -69,22 +56,11 @@ public class Board {
 
     // is this board the goal board?
     public boolean isGoal() {
-        for (int i = 0; i < dimension * dimension - 1; i++) {
-            int row = i / dimension;
-            int col = i % dimension;
-            if (tiles[row][col] != i+1) {
-                return false;
-            }
-        }
-        return isLastTileBlank();
+        return matrix.isConsecutiveButLast() && isLastTileBlank();
     }
 
     private boolean isLastTileBlank() {
-        return getLastTile() == 0;
-    }
-
-    private int getLastTile() {
-        return tiles[dimension - 1][dimension - 1];
+        return matrix.getLast() == 0;
     }
 
     // does this board equal y?
@@ -92,7 +68,7 @@ public class Board {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Board board = (Board) o;
-        return Arrays.deepEquals(tiles, board.tiles);
+        return matrix.equals(board.matrix);
     }
 
     // all neighboring boards
@@ -107,4 +83,79 @@ public class Board {
 
     // unit testing (not graded)
     public static void main(String[] args) {}
+
+    private static class SmallintMatrix {
+        private final char[] charArray;
+        private final int dimension;
+
+        private SmallintMatrix(int[][] ints) {
+            if (ints.length == 0) {
+                throw new IllegalArgumentException();
+            }
+            dimension = ints.length;
+            charArray = new char[dimension*dimension];
+            copyToCharArray(ints);
+        }
+
+        private void copyToCharArray(int[][] ints) {
+            for (int row = 0; row < dimension; row++) {
+                if (ints[row].length != dimension) {
+                    throw new IllegalArgumentException();
+                }
+                for (int col = 0; col < dimension; col++) {
+                    charArray[row*dimension + col] = (char) ints[row][col];
+                }
+            }
+        }
+
+        private int getDimension() {
+            return dimension;
+        }
+
+        private int getFirst() {
+            return charArray[0];
+        }
+
+        private int getSecond() {
+            return charArray[1];
+        }
+
+        private int getOneBeforeLast() {
+            return charArray[count() - 2];
+        }
+
+        private int getLast() {
+            return charArray[count() - 1];
+        }
+
+        //0-based
+        private int get(int row, int col) {
+            int index = row * dimension + col;
+            return charArray[index];
+        }
+
+        private int count() {
+            return charArray.length;
+        }
+
+        private boolean isConsecutiveButLast() {
+            for (int i = 0; i < count() - 1; i++) {
+                if (charArray[i] != i+1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SmallintMatrix that = (SmallintMatrix) o;
+            return Arrays.equals(charArray, that.charArray);
+        }
+
+        public int hashCode() {
+            return Arrays.hashCode(charArray);
+        }
+    }
 }

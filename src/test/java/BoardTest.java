@@ -57,4 +57,14 @@ public class BoardTest {
                 )
         );
     }
+
+/*    @Test
+    public void twin() {
+        Board board =       new Board(new int[][]{ { 1, 2 }, { 3, 0 } });
+        Board firstTwin =   new Board(new int[][]{ { 2, 1 }, { 3, 0 } });
+        Board secondTwin =  new Board(new int[][]{ { 3, 2 }, { 1, 0 } });
+
+        Board aTwin = board.twin();
+        assertTrue(aTwin.equals(firstTwin) || aTwin.equals(secondTwin));
+    }*/
 }
