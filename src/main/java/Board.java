@@ -18,6 +18,10 @@ public class Board {
         matrix = new SmallintMatrix(inTiles);
     }
 
+    private Board(SmallintMatrix newMatrix) {
+        matrix = newMatrix;
+    }
+
     private void validateN(int n) {
         if (n < 2 || n > 128) {
             throw new IllegalArgumentException();
@@ -78,12 +82,23 @@ public class Board {
 
     // a board that is obtained by exchanging any pair of tiles
     public Board twin() {
-        return null;
+        return new Board(makeTwinMatrix());
+    }
+
+    private SmallintMatrix makeTwinMatrix() {
+        if (matrix.getFirst() != 0 && matrix.getSecond() != 0) {
+            return matrix.exchangeFirstWithSecond();
+        }
+        return matrix.exchangeLastWithOneBefore();
     }
 
     // unit testing (not graded)
     public static void main(String[] args) {}
 
+
+    /*****************************
+     * SMALL INT MATRIX
+     *****************************/
     private static class SmallintMatrix {
         private final char[] charArray;
         private final int dimension;
@@ -95,6 +110,11 @@ public class Board {
             dimension = ints.length;
             charArray = new char[dimension*dimension];
             copyToCharArray(ints);
+        }
+
+        private SmallintMatrix(char[] chars, int dim) {
+            charArray = chars;
+            dimension = dim;
         }
 
         private void copyToCharArray(int[][] ints) {
@@ -145,6 +165,23 @@ public class Board {
                 }
             }
             return true;
+        }
+
+        private SmallintMatrix exchangeFirstWithSecond() {
+            return exchangeAt(0,1);
+        }
+
+        private SmallintMatrix exchangeLastWithOneBefore() {
+            return exchangeAt(count()-2,count()-1);
+        }
+
+        private SmallintMatrix exchangeAt(int i, int j) {
+            char[] copy = new char[count()];
+            System.arraycopy(charArray, 0, copy, 0, count());
+            char c = copy[i];
+            copy[i] = copy[j];
+            copy[j] = c;
+            return new SmallintMatrix(copy, dimension);
         }
 
         public boolean equals(Object o) {

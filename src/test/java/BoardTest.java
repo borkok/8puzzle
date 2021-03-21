@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BoardTest {
     @Test
@@ -58,7 +59,7 @@ public class BoardTest {
         );
     }
 
-/*    @Test
+   @Test
     public void twin() {
         Board board =       new Board(new int[][]{ { 1, 2 }, { 3, 0 } });
         Board firstTwin =   new Board(new int[][]{ { 2, 1 }, { 3, 0 } });
@@ -66,5 +67,5 @@ public class BoardTest {
 
         Board aTwin = board.twin();
         assertTrue(aTwin.equals(firstTwin) || aTwin.equals(secondTwin));
-    }*/
+    }
 }
