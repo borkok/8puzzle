@@ -3,24 +3,37 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class Board {
     private final int[][] tiles;
+    private final int dimension;
 
     // create a board from an n-by-n array of tiles,
     // where tiles[row][col] = tile at (row, col)
     public Board(int[][] inTiles) {
+        validateN(inTiles.length);
+        dimension = inTiles.length;
         tiles = deepCopy(inTiles);
     }
 
     private int[][] deepCopy(int[][] inTiles) {
-        int rows = inTiles.length;
-        int[][] ints = new int[0][];
-
+        int[][] ints = new int[dimension][dimension];
+        for (int i = 0; i < dimension; i++) {
+            if (inTiles[i].length != dimension) {
+                throw new IllegalArgumentException();
+            }
+            System.arraycopy(inTiles[i], 0, ints[i], 0, dimension);
+        }
         return ints;
+    }
+
+    private void validateN(int n) {
+        if (n < 2 || n > 128) {
+            throw new IllegalArgumentException();
+        }
     }
 
     // string representation of this board
     public String toString() {
         StringBuilder s = new StringBuilder();
-        int n = dimension();
+        int n = dimension;
         s.append(n + "\n");
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
