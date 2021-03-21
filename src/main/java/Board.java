@@ -1,5 +1,7 @@
 import net.jcip.annotations.Immutable;
 
+import java.util.Arrays;
+
 /*
 You may assume that the constructor receives an n-by-n array containing the n2 integers
 between 0 and n2 − 1, where 0 represents the blank square.
@@ -86,8 +88,11 @@ public class Board {
     }
 
     // does this board equal y?
-    public boolean equals(Object y) {
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Board board = (Board) o;
+        return Arrays.deepEquals(tiles, board.tiles);
     }
 
     // all neighboring boards

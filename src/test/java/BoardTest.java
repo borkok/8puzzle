@@ -40,4 +40,21 @@ public class BoardTest {
                 )
         );
     }
+
+    @ParameterizedTest
+    @MethodSource
+    public void equals(int[][] tiles, int[][] otherTiles, boolean expected) {
+        assertThat(new Board(tiles).equals(new Board(otherTiles))).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> equals() {
+        return Stream.of(
+                Arguments.of(
+                        new int[][] {  {1,2},  {3,0}  }, new int[][] {  {1,2},  {3,0}  }, true
+                ),
+                Arguments.of(
+                        new int[][] {  {2,1},  {3,0}  }, new int[][] {  {1,2},  {3,0}  }, false
+                )
+        );
+    }
 }
