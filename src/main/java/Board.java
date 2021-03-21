@@ -1,5 +1,10 @@
 import net.jcip.annotations.Immutable;
 
+/*
+You may assume that the constructor receives an n-by-n array containing the n2 integers
+between 0 and n2 − 1, where 0 represents the blank square.
+You may also assume that 2 ≤ n < 128.
+ */
 @Immutable
 public class Board {
     private final int[][] tiles;
@@ -46,22 +51,38 @@ public class Board {
 
     // board dimension n
     public int dimension() {
-        return 0;
+        return dimension;
     }
 
-    // number of tiles out of place
+    //The Hamming distance between a board and the goal board is the number of tiles in the wrong position.
     public int hamming() {
         return 0;
     }
 
-    // sum of Manhattan distances between tiles and goal
+    //The Manhattan distance between a board and the goal board is the sum of the Manhattan distances
+    //(sum of the vertical and horizontal distance) from the tiles to their goal positions.
     public int manhattan() {
         return 0;
     }
 
     // is this board the goal board?
     public boolean isGoal() {
-        return false;
+        for (int i = 0; i < dimension * dimension - 1; i++) {
+            int row = i / dimension;
+            int col = i % dimension;
+            if (tiles[row][col] != i+1) {
+                return false;
+            }
+        }
+        return isLastTileBlank();
+    }
+
+    private boolean isLastTileBlank() {
+        return getLastTile() == 0;
+    }
+
+    private int getLastTile() {
+        return tiles[dimension - 1][dimension - 1];
     }
 
     // does this board equal y?
