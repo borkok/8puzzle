@@ -68,4 +68,47 @@ public class BoardTest {
         Board aTwin = board.twin();
         assertTrue(aTwin.equals(firstTwin) || aTwin.equals(secondTwin));
     }
+
+    @ParameterizedTest
+    @MethodSource
+    public void hamming(int[][] tiles, int expected) {
+        assertThat(new Board(tiles).hamming()).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> hamming() {
+        return Stream.of(
+                Arguments.of(
+                        new int[][] {  {1,2},  {3,0}  }, 0
+                ),
+                Arguments.of(
+                        new int[][] {  {2,1},  {3,0}  }, 2
+                ),
+                Arguments.of(
+                        new int[][] {  {8,1,3},  {4,0,2}, {7,6,5}  }, 5
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void manhattan(int[][] tiles, int expected) {
+        assertThat(new Board(tiles).hamming()).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> manhattan() {
+        return Stream.of(
+                Arguments.of(
+                        new int[][] {  {1,2},  {3,0}  }, 0
+                )
+/*                ,Arguments.of(
+                        new int[][] {  {2,1},  {3,0}  }, 2
+                )
+                ,Arguments.of(
+                        new int[][] {  {1,3},  {2,0}  }, 4
+                )
+                ,Arguments.of(
+                        new int[][] {  {8,1,3},  {4,0,2}, {7,6,5}  }, 10
+                )*/
+        );
+    }
 }

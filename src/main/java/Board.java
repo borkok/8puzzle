@@ -49,7 +49,7 @@ public class Board {
 
     //The Hamming distance between a board and the goal board is the number of tiles in the wrong position.
     public int hamming() {
-        return 0;
+        return matrix.countNonConsecutiveButLast();
     }
 
     //The Manhattan distance between a board and the goal board is the sum of the Manhattan distances
@@ -165,6 +165,16 @@ public class Board {
                 }
             }
             return true;
+        }
+
+        private int countNonConsecutiveButLast() {
+            int count = 0;
+            for (int i = 0; i < count() - 1; i++) {
+                if (charArray[i] != i+1) {
+                    count++;
+                }
+            }
+            return count;
         }
 
         private SmallintMatrix exchangeFirstWithSecond() {
