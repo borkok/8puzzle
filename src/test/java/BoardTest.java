@@ -3,6 +3,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -106,12 +107,47 @@ public class BoardTest {
                 ,Arguments.of(
                         new int[][] {  {1,2},  {0,3}  }, 1
                 )
-/*                 ,Arguments.of(
+                 ,Arguments.of(
                         new int[][] {  {1,3},  {2,0}  }, 4
                 )
                ,Arguments.of(
                         new int[][] {  {8,1,3},  {4,0,2}, {7,6,5}  }, 10
-                )*/
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void neighbors(int[][] tiles, List<Board> boardList) {
+        assertThat(new Board(tiles).neighbors()).hasSameSizeAs(boardList)
+                                                .containsOnlyOnceElementsOf(boardList);
+    }
+
+    private static Stream<Arguments> neighbors() {
+        return Stream.of(
+                Arguments.of(
+                        new int[][] {  {0,2},  {3,1}  },
+                        List.of(
+                            new Board(new int[][] {  {2,0},  {3,1}  }),
+                            new Board(new int[][] {  {3,2},  {0,1}  })
+                        )
+                )
+                ,Arguments.of(
+                        new int[][] {  {1,2},  {3,0}  },
+                        List.of(
+                            new Board(new int[][] {  {1,2},  {0,3}  }),
+                            new Board(new int[][] {  {1,0},  {3,2}  })
+                        )
+                )
+                ,Arguments.of(
+                        new int[][] {  {8,1,3},  {4,0,2}, {7,6,5}  },
+                        List.of(
+                            new Board(new int[][] {  {8,1,3},  {0,4,2}, {7,6,5}  }),
+                            new Board(new int[][] {  {8,1,3},  {4,2,0}, {7,6,5}  }),
+                            new Board(new int[][] {  {8,1,3},  {4,6,2}, {7,0,5}  }),
+                            new Board(new int[][] {  {8,0,3},  {4,1,2}, {7,6,5}  })
+                        )
+                )
         );
     }
 }

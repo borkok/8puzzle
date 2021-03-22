@@ -1,6 +1,8 @@
+import edu.princeton.cs.algs4.Stack;
 import net.jcip.annotations.Immutable;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /*
 You may assume that the constructor receives an n-by-n array containing the n2 integers
@@ -87,7 +89,22 @@ public class Board {
 
     // all neighboring boards
     public Iterable<Board> neighbors() {
-        return null;
+        RowCol blankRowCol = matrix.find(0);
+        return createStackWithoutEmpty(
+                matrix.exchange(blankRowCol, blankRowCol.up()),
+                matrix.exchange(blankRowCol, blankRowCol.left()),
+                matrix.exchange(blankRowCol, blankRowCol.down(dimension())),
+                matrix.exchange(blankRowCol, blankRowCol.right(dimension()))
+        );
+    }
+
+    private Stack<Board> createStackWithoutEmpty(SmallintMatrix... matrices) {
+        Stack<Board> stack = new Stack<>();
+        for (SmallintMatrix matrix : matrices) {
+            if (matrix.isEmpty()) continue;
+            stack.push(new Board(matrix));
+        }
+        return stack;
     }
 
     // a board that is obtained by exchanging any pair of tiles
@@ -110,6 +127,7 @@ public class Board {
      * SMALL INT MATRIX
      *****************************/
     private static class SmallintMatrix {
+        public static final SmallintMatrix EMPTY = new SmallintMatrix(new char[0], 0);
         private final char[] charArray;
         private final int dimension;
 
@@ -125,6 +143,10 @@ public class Board {
         private SmallintMatrix(char[] chars, int dim) {
             charArray = chars;
             dimension = dim;
+        }
+
+        private boolean isEmpty() {
+            return dimension==0;
         }
 
         private void copyToCharArray(int[][] ints) {
@@ -148,10 +170,6 @@ public class Board {
 
         private int getSecond() {
             return charArray[1];
-        }
-
-        private int getOneBeforeLast() {
-            return charArray[count() - 2];
         }
 
         private int getLast() {
@@ -211,6 +229,15 @@ public class Board {
             return RowCol.of(row, col);
         }
 
+        private RowCol find(int number) {
+            for (int index = 0; index < count(); index++) {
+                if (charArray[index] == number) {
+                    return indexToRowCol(index);
+                }
+            }
+            return RowCol.EMPTY;
+        }
+
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -221,9 +248,23 @@ public class Board {
         public int hashCode() {
             return Arrays.hashCode(charArray);
         }
+
+        public SmallintMatrix exchange(RowCol rowCol, RowCol otherRowCol) {
+            if (rowCol.isEmpty() || otherRowCol.isEmpty()) {
+                return EMPTY;
+            }
+            return exchangeAt(
+                    rowCol.toIndex(dimension),
+                    otherRowCol.toIndex(dimension)
+            );
+        }
     }
 
+    /**********************************
+     * ROW COL 0-based
+     ******************************/
     private static class RowCol {
+        public static RowCol EMPTY = new RowCol(-1, -1);
         final int row;
         final int col;
 
@@ -238,6 +279,54 @@ public class Board {
 
         private int distanceTo(RowCol otherRowCol) {
             return Math.abs(otherRowCol.row - row) + Math.abs(otherRowCol.col - col);
+        }
+
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            RowCol rowCol = (RowCol) o;
+            return row == rowCol.row &&
+                    col == rowCol.col;
+        }
+
+        public int hashCode() {
+            return Objects.hash(row, col);
+        }
+
+        private RowCol up() {
+            if (row == 0) {
+                return EMPTY;
+            }
+            return RowCol.of(row-1, col);
+        }
+
+        private RowCol left() {
+            if (col == 0) {
+                return EMPTY;
+            }
+            return RowCol.of(row, col-1);
+        }
+
+        private RowCol down(int dimension) {
+            if (row >= dimension-1) {
+                return EMPTY;
+            }
+            return RowCol.of(row+1, col);
+        }
+
+        private RowCol right(int dimension) {
+            if (col >= dimension-1) {
+                return EMPTY;
+            }
+            return RowCol.of(row, col+1);
+        }
+
+        public int toIndex(int dimension) {
+            return row * dimension + col;
+        }
+
+        public boolean isEmpty() {
+            return this.equals(EMPTY);
         }
     }
 }
