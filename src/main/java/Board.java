@@ -9,6 +9,7 @@ You may also assume that 2 ≤ n < 128.
  */
 @Immutable
 public class Board {
+    public static final int BLANK = 0;
     private final SmallintMatrix matrix;
 
     // create a board from an n-by-n array of tiles,
@@ -55,7 +56,16 @@ public class Board {
     //The Manhattan distance between a board and the goal board is the sum of the Manhattan distances
     //(sum of the vertical and horizontal distance) from the tiles to their goal positions.
     public int manhattan() {
-        return 0;
+        int manhattan = 0;
+        for (int row = 0; row < dimension(); row++) {
+            for (int col = 0; col < dimension(); col++) {
+                int number = matrix.get(row, col);
+                if (number == BLANK)  continue;
+                manhattan += matrix.indexToRowCol(number - 1)
+                                   .distanceTo(RowCol.of(row, col));
+            }
+        }
+        return manhattan;
     }
 
     // is this board the goal board?
@@ -194,6 +204,13 @@ public class Board {
             return new SmallintMatrix(copy, dimension);
         }
 
+        // 0-based
+        private RowCol indexToRowCol(int index) {
+            int row = index / dimension;
+            int col = index % dimension;
+            return RowCol.of(row, col);
+        }
+
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -203,6 +220,24 @@ public class Board {
 
         public int hashCode() {
             return Arrays.hashCode(charArray);
+        }
+    }
+
+    private static class RowCol {
+        final int row;
+        final int col;
+
+        private static RowCol of(int row, int col) {
+            return new RowCol(row, col);
+        }
+
+        private RowCol(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+
+        private int distanceTo(RowCol otherRowCol) {
+            return Math.abs(otherRowCol.row - row) + Math.abs(otherRowCol.col - col);
         }
     }
 }

@@ -92,7 +92,7 @@ public class BoardTest {
     @ParameterizedTest
     @MethodSource
     public void manhattan(int[][] tiles, int expected) {
-        assertThat(new Board(tiles).hamming()).isEqualTo(expected);
+        assertThat(new Board(tiles).manhattan()).isEqualTo(expected);
     }
 
     private static Stream<Arguments> manhattan() {
@@ -100,13 +100,16 @@ public class BoardTest {
                 Arguments.of(
                         new int[][] {  {1,2},  {3,0}  }, 0
                 )
-/*                ,Arguments.of(
+                ,Arguments.of(
                         new int[][] {  {2,1},  {3,0}  }, 2
                 )
                 ,Arguments.of(
+                        new int[][] {  {1,2},  {0,3}  }, 1
+                )
+/*                 ,Arguments.of(
                         new int[][] {  {1,3},  {2,0}  }, 4
                 )
-                ,Arguments.of(
+               ,Arguments.of(
                         new int[][] {  {8,1,3},  {4,0,2}, {7,6,5}  }, 10
                 )*/
         );
