@@ -1,4 +1,11 @@
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -6,43 +13,39 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class SolverTest {
 
     @Test
-    public void init() {
+    public void init_exceptions() {
         assertThatThrownBy(() -> new Solver(null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test
-    public void testIsSolvable() {
+    @ParameterizedTest
+    @MethodSource
+    public void solution(Board initial, int expectedMoves,
+                         List<Board> expectedSolution) {
         //WHEN
-        boolean result = new Solver(new Board(new int[][] { {0} })).isSolvable();
+        Solver result = new Solver(initial);
 
         //THEN
-        assertThat(result).isEqualTo(null);
+        assertThat(result.moves()).isEqualTo(expectedMoves);
+        assertThat(result.solution())
+                .hasSameSizeAs(expectedSolution)
+                .containsOnlyOnceElementsOf(expectedSolution);
     }
 
-    @Test
-    public void testMoves() {
-        //WHEN
-        int result = new Solver(new Board(new int[][] { {0} })).moves();
-
-        //THEN
-        assertThat(result).isEqualTo(null);
-    }
-
-    @Test
-    public void testSolution() {
-        //WHEN
-        Iterable<Board> result = new Solver(new Board(new int[][] { {0} })).solution();
-
-        //THEN
-        assertThat(result).isEqualTo(null);
-    }
-
-    @Test
-    public void testMain() {
-        //WHEN
-        Solver.main(new String[] { "args" });
-
-        //THEN
+    private static Stream<Arguments> solution() {
+        return Stream.of(
+                Arguments.of(
+                        //initial
+                        new Board(new int[][] {  {1,2},  {3,0}  }),
+                        //moves
+                        0,
+                        //solution
+                        Collections.EMPTY_LIST
+/*                        List.of(
+                                new Board(new int[][] {  {2,0},  {3,1}  }),
+                                new Board(new int[][] {  {3,2},  {0,1}  })
+                        )*/
+                )
+        );
     }
 }

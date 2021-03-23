@@ -1,36 +1,37 @@
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
 /*
 When considering the neighbors of a search node, don’t enqueue a neighbor
 if its board is the same as the board of the previous search node in the game tree
-
-To avoid recomputing the Manhattan priority of a search node from scratch each time
-during various priority queue operations, pre-compute its value when you construct
-the search node; save it in an instance variable; and return the saved value as needed.
  */
 public class Solver {
+    private final int moves;
+    private final Stack<Board> solution;
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
         if (initial == null) {
             throw new IllegalArgumentException();
         }
+        moves = 0;
+        solution = new Stack<>();
     }
 
     // is the initial board solvable? (see below)
     public boolean isSolvable() {
-        return false;
+        return moves >= 0;
     }
 
     // min number of moves to solve initial board; -1 if unsolvable
     public int moves() {
-        return 0;
+        return moves;
     }
 
     // sequence of boards in a shortest solution; null if unsolvable
     public Iterable<Board> solution() {
-        return null;
+        return isSolvable() ? solution : null;
     }
 
     // test client (see below)
