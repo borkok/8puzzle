@@ -8,21 +8,34 @@ import java.util.Objects;
 You may assume that the constructor receives an n-by-n array containing the n2 integers
 between 0 and n2 − 1, where 0 represents the blank square.
 You may also assume that 2 ≤ n < 128.
+
+To avoid recomputing the Manhattan priority of a search node from scratch each time
+during various priority queue operations, pre-compute its value when you construct
+the search node; save it in an instance variable; and return the saved value as needed.
  */
 @Immutable
 public class Board {
     public static final int BLANK = 0;
     private final SmallintMatrix matrix;
 
+    private final int hamming;
+    private final int manhattan;
+
     // create a board from an n-by-n array of tiles,
     // where tiles[row][col] = tile at (row, col)
     public Board(int[][] inTiles) {
         validateN(inTiles.length);
         matrix = new SmallintMatrix(inTiles);
+
+        hamming = calculateHamming();
+        manhattan = calculateManhattan();
     }
 
     private Board(SmallintMatrix newMatrix) {
         matrix = newMatrix;
+
+        hamming = calculateHamming();
+        manhattan = calculateManhattan();
     }
 
     private void validateN(int n) {
@@ -52,12 +65,20 @@ public class Board {
 
     //The Hamming distance between a board and the goal board is the number of tiles in the wrong position.
     public int hamming() {
+        return hamming;
+    }
+
+    private int calculateHamming() {
         return matrix.countNonConsecutiveButLast();
     }
 
     //The Manhattan distance between a board and the goal board is the sum of the Manhattan distances
     //(sum of the vertical and horizontal distance) from the tiles to their goal positions.
     public int manhattan() {
+        return manhattan;
+    }
+
+    private int calculateManhattan() {
         int manhattan = 0;
         for (int row = 0; row < dimension(); row++) {
             for (int col = 0; col < dimension(); col++) {
