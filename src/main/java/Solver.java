@@ -4,33 +4,34 @@ import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
 public class Solver {
-    private final Stack<Board> solution;
-    private final BoardPriorityQueue boardPriorityQueue;
+    private Stack<Board> solution;
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
         if (initial == null) {
             throw new IllegalArgumentException();
         }
-        solution = new Stack<>();
-        boardPriorityQueue = new BoardPriorityQueue(initial);
+
+        clearSolution();
+        BoardPriorityQueue priorityQueue = new BoardPriorityQueue(initial);
+        BoardPriorityQueue twinPriorityQueue = new BoardPriorityQueue(initial.twin());
 
         while(true) {
-            Board min = boardPriorityQueue.getMin();
+            Board min = priorityQueue.getMin();
             solution.push(min);
             if (min.isGoal())  break;
-            putNeighborsInQueue(min);
-            boardPriorityQueue.removeMin();
+            priorityQueue.putNeighborsAndRemoveMin();
+
+            if (twinPriorityQueue.isMinAGoal()) {
+                clearSolution();
+                break;
+            }
+            twinPriorityQueue.putNeighborsAndRemoveMin();
         }
     }
 
-    private void putNeighborsInQueue(Board min) {
-        Iterable<Board> neighbors = min.neighbors();
-        for (Board neighbor : neighbors) {
-            if (!boardPriorityQueue.isMinPreviousEqualTo(neighbor)){
-                boardPriorityQueue.insert(neighbor);
-            }
-        }
+    private void clearSolution() {
+        solution = new Stack<>();
     }
 
     // is the initial board solvable? (see below)
@@ -84,7 +85,11 @@ public class Solver {
             return queue.min().board;
         }
 
-        public boolean isMinPreviousEqualTo(Board neighbor) {
+        private boolean isMinAGoal() {
+            return getMin().isGoal();
+        }
+
+        public boolean isPreviousOfMinEqualTo(Board neighbor) {
             if (queue.min().hasNoPrevious()) return false;
             return queue.min().previousBoardEquals(neighbor);
         }
@@ -97,6 +102,16 @@ public class Solver {
 
         public void removeMin() {
             queue.delMin();
+        }
+
+        private void putNeighborsAndRemoveMin() {
+            Iterable<Board> neighbors = getMin().neighbors();
+            for (Board neighbor : neighbors) {
+                if (!isPreviousOfMinEqualTo(neighbor)){
+                    insert(neighbor);
+                }
+            }
+            removeMin();
         }
     }
 

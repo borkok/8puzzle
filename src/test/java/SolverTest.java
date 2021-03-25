@@ -68,4 +68,24 @@ public class SolverTest {
                 )
         );
     }
+
+    @ParameterizedTest
+    @MethodSource
+    public void unsolvable(Board initial) {
+        //WHEN
+        Solver result = new Solver(initial);
+
+        //THEN
+        assertThat(result.moves()).isEqualTo(-1);
+        assertThat(result.solution()).isNull();
+    }
+
+    private static Stream<Arguments> unsolvable() {
+        return Stream.of(
+                Arguments.of(
+                        //initial
+                        new Board(new int[][] {  {0,1},  {2,3}  })
+                )
+        );
+    }
 }
