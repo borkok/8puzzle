@@ -1,5 +1,4 @@
 import edu.princeton.cs.algs4.Stack;
-import net.jcip.annotations.Immutable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -13,9 +12,8 @@ To avoid recomputing the Manhattan priority of a search node from scratch each t
 during various priority queue operations, pre-compute its value when you construct
 the search node; save it in an instance variable; and return the saved value as needed.
  */
-@Immutable
 public class Board {
-    public static final int BLANK = 0;
+    private static final int BLANK = 0;
     private final SmallintMatrix matrix;
 
     private final int hamming;
