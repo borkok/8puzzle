@@ -3,10 +3,6 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
-/*
-When considering the neighbors of a search node, don’t enqueue a neighbor
-if its board is the same as the board of the previous search node in the game tree
- */
 public class Solver {
     private final Stack<Board> solution;
     private final BoardPriorityQueue boardPriorityQueue;
@@ -20,17 +16,19 @@ public class Solver {
         boardPriorityQueue = new BoardPriorityQueue(initial);
 
         while(true) {
-            SearchNode min = boardPriorityQueue.queue.delMin();
-            solution.push(min.board);
-            if (min.board.isGoal()) {
-                break;
-            }
-            Iterable<Board> neighbors = min.board.neighbors();
-            for (Board neighbor : neighbors) {
-                if (min.previous != null && neighbor.equals(min.previous.board)) {
-                    continue;
-                }
-                boardPriorityQueue.queue.insert(new SearchNode(min.movesSoFar + 1, min, neighbor));
+            Board min = boardPriorityQueue.getMin();
+            solution.push(min);
+            if (min.isGoal())  break;
+            putNeighborsInQueue(min);
+            boardPriorityQueue.removeMin();
+        }
+    }
+
+    private void putNeighborsInQueue(Board min) {
+        Iterable<Board> neighbors = min.neighbors();
+        for (Board neighbor : neighbors) {
+            if (!boardPriorityQueue.isMinPreviousEqualTo(neighbor)){
+                boardPriorityQueue.insert(neighbor);
             }
         }
     }
@@ -74,13 +72,31 @@ public class Solver {
         }
     }
 
-
     private static class BoardPriorityQueue {
         private final MinPQ<SearchNode> queue;
 
         private BoardPriorityQueue(Board board) {
             queue = new MinPQ<>();
-            queue.insert(new SearchNode(0,SearchNode.EMPTY,board));
+            queue.insert(new SearchNode(0, SearchNode.EMPTY, board));
+        }
+
+        private Board getMin() {
+            return queue.min().board;
+        }
+
+        public boolean isMinPreviousEqualTo(Board neighbor) {
+            if (queue.min().hasNoPrevious()) return false;
+            return queue.min().previousBoardEquals(neighbor);
+        }
+
+        public void insert(Board neighbor) {
+            queue.insert(
+                    new SearchNode(queue.min().movesSoFar + 1, queue.min(), neighbor)
+            );
+        }
+
+        public void removeMin() {
+            queue.delMin();
         }
     }
 
@@ -120,6 +136,14 @@ public class Solver {
         // plus the number of moves made so far to get to the search node.
         private int priority() {
             return board.manhattan() + movesSoFar;
+        }
+
+        public boolean hasNoPrevious() {
+            return previous == EMPTY;
+        }
+
+        private boolean previousBoardEquals(Board neighbor) {
+            return previous.board.equals(neighbor);
         }
     }
 }

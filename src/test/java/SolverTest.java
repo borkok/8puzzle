@@ -54,6 +54,18 @@ public class SolverTest {
                                 new Board(new int[][] {  {1,2},  {0,3}  })
                         )
                 )
+                ,Arguments.of(
+                        //initial
+                        new Board(new int[][] {  {0,1},  {3,2}  }),
+                        //moves
+                        2,
+                        //solution
+                        List.of(
+                                new Board(new int[][] {  {0,1},  {3,2}  }),
+                                new Board(new int[][] {  {1,0},  {3,2}  }),
+                                new Board(new int[][] {  {1,2},  {3,0}  })
+                        )
+                )
         );
     }
 }
