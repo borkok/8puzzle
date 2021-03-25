@@ -3,8 +3,12 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.Objects;
+
 public class Solver {
     private Stack<Board> solution;
+    private final BoardPriorityQueue priorityQueue;
+    private final BoardPriorityQueue twinPriorityQueue;
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
@@ -13,21 +17,42 @@ public class Solver {
         }
 
         clearSolution();
-        BoardPriorityQueue priorityQueue = new BoardPriorityQueue(initial);
-        BoardPriorityQueue twinPriorityQueue = new BoardPriorityQueue(initial.twin());
+        priorityQueue = new BoardPriorityQueue(initial);
+        twinPriorityQueue = new BoardPriorityQueue(initial.twin());
 
-        while(true) {
-            Board min = priorityQueue.getMin();
-            solution.push(min);
-            if (min.isGoal())  break;
-            priorityQueue.putNeighborsAndRemoveMin();
+        while (makeMove()) ;
+    }
 
-            if (twinPriorityQueue.isMinAGoal()) {
-                clearSolution();
-                break;
-            }
-            twinPriorityQueue.putNeighborsAndRemoveMin();
+    /**
+     * @return true if should make another move, false if should stop
+     */
+    private boolean makeMove() {
+        if (!makeMoveOnBoard()) return false;
+        return makeMoveOnTwin();
+    }
+
+    private boolean makeMoveOnBoard() {
+        solution.push(priorityQueue.getMin());
+        if (achievedGoal()) return false;
+        priorityQueue.putNeighborsAndRemoveMin();
+        return true;
+    }
+
+    private boolean achievedGoal() {
+        return priorityQueue.isMinAGoal();
+    }
+
+    private boolean makeMoveOnTwin() {
+        if (provedUnsolvable()) {
+            clearSolution();
+            return false;
         }
+        twinPriorityQueue.putNeighborsAndRemoveMin();
+        return true;
+    }
+
+    private boolean provedUnsolvable() {
+        return twinPriorityQueue.isMinAGoal();
     }
 
     private void clearSolution() {
@@ -41,7 +66,7 @@ public class Solver {
 
     // min number of moves to solve initial board; -1 if unsolvable
     public int moves() {
-        return solution.size()-1;
+        return solution.size() - 1;
     }
 
     // sequence of boards in a shortest solution; null if unsolvable
@@ -50,7 +75,7 @@ public class Solver {
     }
 
     // test client (see below)
-    public static void main(String[] args){
+    public static void main(String[] args) {
         // create initial board from file
         In in = new In(args[0]);
         int n = in.readInt();
@@ -107,7 +132,7 @@ public class Solver {
         private void putNeighborsAndRemoveMin() {
             Iterable<Board> neighbors = getMin().neighbors();
             for (Board neighbor : neighbors) {
-                if (!isPreviousOfMinEqualTo(neighbor)){
+                if (!isPreviousOfMinEqualTo(neighbor)) {
                     insert(neighbor);
                 }
             }
@@ -120,7 +145,7 @@ public class Solver {
      * the number of moves made to reach the board, and the previous search node.
      */
     private static class SearchNode implements Comparable<SearchNode> {
-        public static SearchNode EMPTY = null;
+        public static final SearchNode EMPTY = null;
         private final int movesSoFar;
         private final SearchNode previous;
         private final Board board;
@@ -131,20 +156,21 @@ public class Solver {
             this.board = board;
         }
 
-        public int getMovesSoFar() {
-            return movesSoFar;
-        }
-
-        public SearchNode getPrevious() {
-            return previous;
-        }
-
-        public Board getBoard() {
-            return board;
-        }
-
         public int compareTo(SearchNode other) {
             return this.priority() - other.priority();
+        }
+
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SearchNode that = (SearchNode) o;
+            return movesSoFar == that.movesSoFar &&
+                    Objects.equals(previous, that.previous) &&
+                    Objects.equals(board, that.board);
+        }
+
+        public int hashCode() {
+            return Objects.hash(movesSoFar, previous, board);
         }
 
         //The Manhattan priority function is the Manhattan distance of a board
