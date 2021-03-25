@@ -3,7 +3,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -40,11 +39,20 @@ public class SolverTest {
                         //moves
                         0,
                         //solution
-                        Collections.EMPTY_LIST
-/*                        List.of(
-                                new Board(new int[][] {  {2,0},  {3,1}  }),
-                                new Board(new int[][] {  {3,2},  {0,1}  })
-                        )*/
+                        List.of(
+                                new Board(new int[][] {  {1,2},  {3,0}  })
+                        )
+                )
+                ,Arguments.of(
+                        //initial
+                        new Board(new int[][] {  {1,2},  {0,3}  }),
+                        //moves
+                        1,
+                        //solution
+                        List.of(
+                                new Board(new int[][] {  {1,2},  {3,0}  }),
+                                new Board(new int[][] {  {1,2},  {0,3}  })
+                        )
                 )
         );
     }
