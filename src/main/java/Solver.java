@@ -157,7 +157,11 @@ public class Solver {
         }
 
         public int compareTo(SearchNode other) {
-            return this.priority() - other.priority();
+            int manhattanPriority = this.manhattanPriority() - other.manhattanPriority();
+            if (manhattanPriority == 0) {
+                return this.hammingPriority() - other.hammingPriority();
+            }
+            return manhattanPriority;
         }
 
         public boolean equals(Object o) {
@@ -173,10 +177,14 @@ public class Solver {
             return Objects.hash(movesSoFar, previous, board);
         }
 
-        //The Manhattan priority function is the Manhattan distance of a board
+        //The Manhattan manhattanPriority function is the Manhattan distance of a board
         // plus the number of moves made so far to get to the search node.
-        private int priority() {
+        private int manhattanPriority() {
             return board.manhattan() + movesSoFar;
+        }
+
+        private int hammingPriority() {
+            return board.hamming() + movesSoFar;
         }
 
         public boolean hasNoPrevious() {

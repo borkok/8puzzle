@@ -82,11 +82,15 @@ public class Board {
             for (int col = 0; col < dimension(); col++) {
                 int number = matrix.get(row, col);
                 if (number == BLANK)  continue;
-                distance += matrix.indexToRowCol(number - 1)
-                                   .distanceTo(RowCol.of(row, col));
+                RowCol presentPosition = RowCol.of(row, col);
+                distance += goalPositionOf(number).distanceTo(presentPosition);
             }
         }
         return distance;
+    }
+
+    private RowCol goalPositionOf(int number) {
+        return matrix.indexToRowCol(number - 1);
     }
 
     // is this board the goal board?
