@@ -79,16 +79,16 @@ public class Board {
     }
 
     private int calculateManhattan() {
-        int manhattan = 0;
+        int distance = 0;
         for (int row = 0; row < dimension(); row++) {
             for (int col = 0; col < dimension(); col++) {
                 int number = matrix.get(row, col);
                 if (number == BLANK)  continue;
-                manhattan += matrix.indexToRowCol(number - 1)
+                distance += matrix.indexToRowCol(number - 1)
                                    .distanceTo(RowCol.of(row, col));
             }
         }
-        return manhattan;
+        return distance;
     }
 
     // is this board the goal board?
@@ -110,7 +110,7 @@ public class Board {
 
     // all neighboring boards
     public Iterable<Board> neighbors() {
-        RowCol blankRowCol = matrix.find(0);
+        RowCol blankRowCol = matrix.findBlank();
         return createStackWithoutEmpty(
                 matrix.exchange(blankRowCol, blankRowCol.up()),
                 matrix.exchange(blankRowCol, blankRowCol.left()),
@@ -121,9 +121,9 @@ public class Board {
 
     private Stack<Board> createStackWithoutEmpty(SmallintMatrix... matrices) {
         Stack<Board> stack = new Stack<>();
-        for (SmallintMatrix matrix : matrices) {
-            if (matrix.isEmpty()) continue;
-            stack.push(new Board(matrix));
+        for (SmallintMatrix sm : matrices) {
+            if (sm.isEmpty()) continue;
+            stack.push(new Board(sm));
         }
         return stack;
     }
@@ -140,8 +140,10 @@ public class Board {
         return matrix.exchangeLastWithOneBefore();
     }
 
-    // unit testing (not graded)
-    public static void main(String[] args) {}
+
+    public static void main(String[] args) {
+        // unit testing (not graded)
+    }
 
 
     /*****************************
@@ -250,9 +252,9 @@ public class Board {
             return RowCol.of(row, col);
         }
 
-        private RowCol find(int number) {
+        private RowCol findBlank() {
             for (int index = 0; index < count(); index++) {
-                if (charArray[index] == number) {
+                if (charArray[index] == BLANK) {
                     return indexToRowCol(index);
                 }
             }
@@ -285,7 +287,7 @@ public class Board {
      * ROW COL 0-based
      ******************************/
     private static class RowCol {
-        public static RowCol EMPTY = new RowCol(-1, -1);
+        public static final RowCol EMPTY = new RowCol(-1, -1);
         final int row;
         final int col;
 
