@@ -43,22 +43,6 @@ public class SolverTest {
                                 new Board(new int[][] { { 1, 2 }, { 3, 0 } })
                         )
                 )
-/*                ,Arguments.of(
-                        //initial
-                        new Board(new int[][] {         {1,  2,  3},
-                                                        {0,  7,  6},
-                                                        {5,  4,  8}
-                        }),
-                        //moves
-                        11,
-                        //solution
-                        List.of(
-                                new Board(new int[][] {         {1,  2,  3},
-                                                                {0,  7,  6},
-                                                                {5,  4,  8}
-                                })
-                        )
-                )*/
                 , Arguments.of(
                         //initial
                         new Board(new int[][] { { 1, 2 }, { 0, 3 } }),

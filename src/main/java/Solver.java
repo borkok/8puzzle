@@ -7,6 +7,7 @@ import java.util.Objects;
 
 public class Solver {
     private Stack<Board> solution;
+    private boolean unsolvable;
     private final BoardPriorityQueue priorityQueue;
     private final BoardPriorityQueue twinPriorityQueue;
 
@@ -16,11 +17,16 @@ public class Solver {
             throw new IllegalArgumentException();
         }
 
-        clearSolution();
         priorityQueue = new BoardPriorityQueue(initial);
         twinPriorityQueue = new BoardPriorityQueue(initial.twin());
 
         while (makeMove()) ;
+
+        if (unsolvable) {
+            clearSolution();
+        } else {
+            putMovesIntoSolution();
+        }
     }
 
     /**
@@ -32,8 +38,7 @@ public class Solver {
     }
 
     private boolean makeMoveOnBoard() {
-        solution.push(priorityQueue.getMin());
-        if (achievedGoal()) return false;
+        if (achievedGoal())  return false;
         priorityQueue.putNeighborsAndRemoveMin();
         return true;
     }
@@ -44,7 +49,7 @@ public class Solver {
 
     private boolean makeMoveOnTwin() {
         if (provedUnsolvable()) {
-            clearSolution();
+            unsolvable = true;
             return false;
         }
         twinPriorityQueue.putNeighborsAndRemoveMin();
@@ -57,6 +62,10 @@ public class Solver {
 
     private void clearSolution() {
         solution = new Stack<>();
+    }
+
+    private void putMovesIntoSolution() {
+        solution = priorityQueue.traverseBoardsFromMin();
     }
 
     // is the initial board solvable? (see below)
@@ -114,29 +123,29 @@ public class Solver {
             return getMin().isGoal();
         }
 
-        public boolean isPreviousOfMinEqualTo(Board neighbor) {
-            if (queue.min().hasNoPrevious()) return false;
-            return queue.min().previousBoardEquals(neighbor);
-        }
-
-        public void insert(Board neighbor) {
-            queue.insert(
-                    new SearchNode(queue.min().movesSoFar + 1, queue.min(), neighbor)
-            );
-        }
-
-        public void removeMin() {
-            queue.delMin();
-        }
-
         private void putNeighborsAndRemoveMin() {
-            Iterable<Board> neighbors = getMin().neighbors();
+            SearchNode min = queue.delMin();
+
+            Iterable<Board> neighbors = min.board.neighbors();
             for (Board neighbor : neighbors) {
-                if (!isPreviousOfMinEqualTo(neighbor)) {
-                    insert(neighbor);
+                if (min.hasNoPrevious() || !min.previousBoardEquals(neighbor)) {
+                    SearchNode node = new SearchNode(min.movesSoFar + 1, min, neighbor);
+                    queue.insert(node);
                 }
             }
-            removeMin();
+        }
+
+        public Stack<Board> traverseBoardsFromMin() {
+            Stack<Board> result = new Stack<>();
+            SearchNode searchNode = queue.delMin();
+            while (true) {
+                result.push(searchNode.board);
+                if (searchNode.hasNoPrevious()) {
+                    break;
+                }
+                searchNode = searchNode.previous;
+            }
+            return result;
         }
     }
 
@@ -158,8 +167,8 @@ public class Solver {
 
         public int compareTo(SearchNode other) {
             int manhattanPriority = this.manhattanPriority() - other.manhattanPriority();
-            if (manhattanPriority == 0) {
-                return this.hammingPriority() - other.hammingPriority();
+           if (manhattanPriority == 0) {
+                return this.board.manhattan() - other.board.manhattan();
             }
             return manhattanPriority;
         }
@@ -181,10 +190,6 @@ public class Solver {
         // plus the number of moves made so far to get to the search node.
         private int manhattanPriority() {
             return board.manhattan() + movesSoFar;
-        }
-
-        private int hammingPriority() {
-            return board.hamming() + movesSoFar;
         }
 
         public boolean hasNoPrevious() {
