@@ -6,66 +6,14 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Objects;
 
 public class Solver {
-    private Stack<Board> solution;
-    private boolean unsolvable;
-    private final BoardPriorityQueue priorityQueue;
-    private final BoardPriorityQueue twinPriorityQueue;
+    private final Stack<Board> solution;
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
         if (initial == null) {
             throw new IllegalArgumentException();
         }
-
-        priorityQueue = new BoardPriorityQueue(initial);
-        twinPriorityQueue = new BoardPriorityQueue(initial.twin());
-
-        while (makeMove()) ;
-
-        if (unsolvable) {
-            clearSolution();
-        } else {
-            putMovesIntoSolution();
-        }
-    }
-
-    /**
-     * @return true if should make another move, false if should stop
-     */
-    private boolean makeMove() {
-        if (!makeMoveOnBoard()) return false;
-        return makeMoveOnTwin();
-    }
-
-    private boolean makeMoveOnBoard() {
-        if (achievedGoal())  return false;
-        priorityQueue.putNeighborsAndRemoveMin();
-        return true;
-    }
-
-    private boolean achievedGoal() {
-        return priorityQueue.isMinAGoal();
-    }
-
-    private boolean makeMoveOnTwin() {
-        if (provedUnsolvable()) {
-            unsolvable = true;
-            return false;
-        }
-        twinPriorityQueue.putNeighborsAndRemoveMin();
-        return true;
-    }
-
-    private boolean provedUnsolvable() {
-        return twinPriorityQueue.isMinAGoal();
-    }
-
-    private void clearSolution() {
-        solution = new Stack<>();
-    }
-
-    private void putMovesIntoSolution() {
-        solution = priorityQueue.traverseBoardsFromMin();
+        solution = PuzzleSolver.of(initial).solution();
     }
 
     // is the initial board solvable? (see below)
@@ -104,6 +52,73 @@ public class Solver {
             StdOut.println("Minimum number of moves = " + solver.moves());
             for (Board board : solver.solution())
                 StdOut.println(board);
+        }
+    }
+
+    private static class PuzzleSolver {
+        private boolean unsolvable;
+        private final BoardPriorityQueue priorityQueue;
+        private final BoardPriorityQueue twinPriorityQueue;
+        private Stack<Board> solution;
+
+        public static PuzzleSolver of(Board initial) {
+            return new PuzzleSolver(initial);
+        }
+
+        private PuzzleSolver(Board initial) {
+            priorityQueue = new BoardPriorityQueue(initial);
+            twinPriorityQueue = new BoardPriorityQueue(initial.twin());
+
+            while (makeMove()) {}
+
+            if (unsolvable) {
+                clearSolution();
+            } else {
+                putMovesIntoSolution();
+            }
+        }
+
+        public Stack<Board> solution() {
+            return solution;
+        }
+
+        /**
+         * @return true if should make another move, false if should stop
+         */
+        private boolean makeMove() {
+            if (!makeMoveOnBoard()) return false;
+            return makeMoveOnTwin();
+        }
+
+        private boolean makeMoveOnBoard() {
+            if (achievedGoal())  return false;
+            priorityQueue.putNeighborsAndRemoveMin();
+            return true;
+        }
+
+        private boolean achievedGoal() {
+            return priorityQueue.isMinAGoal();
+        }
+
+        private boolean makeMoveOnTwin() {
+            if (provedUnsolvable()) {
+                unsolvable = true;
+                return false;
+            }
+            twinPriorityQueue.putNeighborsAndRemoveMin();
+            return true;
+        }
+
+        private boolean provedUnsolvable() {
+            return twinPriorityQueue.isMinAGoal();
+        }
+
+        private void clearSolution() {
+            solution = new Stack<>();
+        }
+
+        private void putMovesIntoSolution() {
+            solution = priorityQueue.traverseBoardsFromMin();
         }
     }
 
