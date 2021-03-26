@@ -69,11 +69,13 @@ public class Solver {
             priorityQueue = new BoardPriorityQueue(initial);
             twinPriorityQueue = new BoardPriorityQueue(initial.twin());
 
-            while (makeMove()) {}
+            while (makeMove()) {
+            }
 
             if (unsolvable) {
                 clearSolution();
-            } else {
+            }
+            else {
                 putMovesIntoSolution();
             }
         }
@@ -91,7 +93,7 @@ public class Solver {
         }
 
         private boolean makeMoveOnBoard() {
-            if (achievedGoal())  return false;
+            if (achievedGoal()) return false;
             priorityQueue.putNeighborsAndRemoveMin();
             return true;
         }
@@ -182,8 +184,8 @@ public class Solver {
 
         public int compareTo(SearchNode other) {
             int manhattanPriority = this.manhattanPriority() - other.manhattanPriority();
-           if (manhattanPriority == 0) {
-                return this.board.manhattan() - other.board.manhattan();
+            if (manhattanPriority == 0) {
+                return this.board.hamming() - other.board.hamming();
             }
             return manhattanPriority;
         }
